@@ -1,19 +1,19 @@
 // WhyTab — options.js
-// Manages the Gemini API key stored in chrome.storage.local.
+// Manages the Anthropic API key stored in chrome.storage.local.
 
-const input     = document.getElementById("apiKeyInput");
-const saveBtn   = document.getElementById("saveBtn");
-const clearBtn  = document.getElementById("clearBtn");
-const toggleBtn = document.getElementById("toggleVisibility");
-const eyeIcon   = document.getElementById("eyeIcon");
-const statusEl  = document.getElementById("status");
+const input       = document.getElementById("apiKeyInput");
+const saveBtn     = document.getElementById("saveBtn");
+const clearBtn    = document.getElementById("clearBtn");
+const toggleBtn   = document.getElementById("toggleVisibility");
+const eyeIcon     = document.getElementById("eyeIcon");
+const statusEl    = document.getElementById("status");
 
 // ─── Load saved key on open ───────────────────────────────────────────────────
 
 async function loadKey() {
-  const result = await chrome.storage.local.get("geminiApiKey");
-  if (result.geminiApiKey) {
-    input.value = result.geminiApiKey;
+  const result = await chrome.storage.local.get("anthropicApiKey");
+  if (result.anthropicApiKey) {
+    input.value = result.anthropicApiKey;
   }
 }
 
@@ -37,19 +37,19 @@ saveBtn.addEventListener("click", async () => {
     return;
   }
 
-  if (!key.startsWith("AIza")) {
-    showStatus("That doesn't look like a valid Gemini key.", "error");
+  if (!key.startsWith("sk-ant-")) {
+    showStatus("That doesn't look like a valid Anthropic key.", "error");
     return;
   }
 
-  await chrome.storage.local.set({ geminiApiKey: key });
+  await chrome.storage.local.set({ anthropicApiKey: key });
   showStatus("API key saved.");
 });
 
 // ─── Clear ────────────────────────────────────────────────────────────────────
 
 clearBtn.addEventListener("click", async () => {
-  await chrome.storage.local.remove("geminiApiKey");
+  await chrome.storage.local.remove("anthropicApiKey");
   input.value = "";
   showStatus("API key cleared.");
 });
