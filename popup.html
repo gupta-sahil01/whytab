@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhyTab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="shell">
+
+    <!-- Header -->
+    <header class="header">
+      <div class="logo">
+        <span class="logo-mark">⌬</span>
+        <span class="logo-text">WhyTab</span>
+      </div>
+      <div class="stale-badge" id="staleBadge" aria-live="polite">
+        <span id="staleCount">0</span>
+        <span class="stale-label">forgotten</span>
+      </div>
+    </header>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="stale">Forgotten</button>
+      <button class="filter-btn" data-filter="recent">Recent</button>
+      <div class="tab-total"><span id="totalCount">—</span> open</div>
+    </div>
+
+    <!-- Tab list -->
+    <main class="tab-list" id="tabList">
+      <div class="loading" id="loadingState">
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+      </div>
+    </main>
+
+    <!-- Empty state (hidden by default) -->
+    <div class="empty-state hidden" id="emptyState">
+      <span class="empty-icon">◎</span>
+      <p>No tabs match this filter.</p>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <span>Data stored locally · No tracking</span>
+      <button class="footer-settings" id="settingsBtn">Settings</button>
+    </footer>
+
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

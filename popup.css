@@ -1,0 +1,448 @@
+/* ── WhyTab Popup Styles ─────────────────────────────────────────────────── */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg:          #0e0e10;
+  --surface:     #18181c;
+  --surface-2:   #222228;
+  --border:      #2e2e38;
+  --text:        #e8e8f0;
+  --text-muted:  #6b6b80;
+  --text-faint:  #3e3e50;
+  --accent:      #7c6dfa;
+  --accent-glow: rgba(124, 109, 250, 0.18);
+  --warn:        #f59e0b;
+  --warn-bg:     rgba(245, 158, 11, 0.08);
+  --warn-border: rgba(245, 158, 11, 0.25);
+  --radius:      8px;
+  --radius-sm:   5px;
+  --font-display: 'Syne', sans-serif;
+  --font-mono:    'DM Mono', monospace;
+}
+
+html, body {
+  width: 400px;
+  min-height: 200px;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-mark {
+  font-size: 18px;
+  color: var(--accent);
+  line-height: 1;
+  filter: drop-shadow(0 0 6px var(--accent-glow));
+}
+
+.logo-text {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.stale-badge {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  background: var(--warn-bg);
+  border: 1px solid var(--warn-border);
+  border-radius: 20px;
+  padding: 3px 10px 3px 9px;
+  transition: opacity 0.2s;
+}
+
+.stale-badge[data-count="0"] {
+  opacity: 0.35;
+}
+
+#staleCount {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: var(--warn);
+  line-height: 1;
+}
+
+.stale-label {
+  font-size: 10px;
+  color: var(--warn);
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* ── Filter bar ──────────────────────────────────────────────────────────── */
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.filter-btn {
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.filter-btn:hover {
+  color: var(--text);
+  border-color: var(--border);
+}
+
+.filter-btn.active {
+  background: var(--surface-2);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+.tab-total {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-faint);
+  font-family: var(--font-mono);
+}
+
+#totalCount {
+  color: var(--text-muted);
+}
+
+/* ── Tab list ────────────────────────────────────────────────────────────── */
+
+.tab-list {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 440px;
+  padding: 8px 0;
+  scrollbar-width: thin;
+  scrollbar-color: var(--surface-2) transparent;
+}
+
+.tab-list::-webkit-scrollbar {
+  width: 4px;
+}
+.tab-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.tab-list::-webkit-scrollbar-thumb {
+  background: var(--surface-2);
+  border-radius: 2px;
+}
+
+/* ── Tab item ────────────────────────────────────────────────────────────── */
+
+.tab-item {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: start;
+  gap: 10px;
+  padding: 9px 16px;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+}
+
+.tab-item:hover {
+  background: var(--surface);
+}
+
+.tab-item.stale {
+  background: var(--warn-bg);
+  border-bottom-color: var(--warn-border);
+}
+
+.tab-item.stale::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--warn);
+  border-radius: 0 1px 1px 0;
+}
+
+.tab-item.stale:hover {
+  background: rgba(245, 158, 11, 0.13);
+}
+
+/* Favicon */
+.tab-favicon {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin: 0 auto;
+  margin-top: 2px;
+  display: block;
+  object-fit: contain;
+}
+
+.tab-favicon-placeholder {
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  margin: 0 auto;
+  margin-top: 2px;
+}
+
+/* Title + URL */
+.tab-info {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tab-title {
+  font-size: 12.5px;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-family: var(--font-mono);
+  font-weight: 500;
+}
+
+.stale .tab-title {
+  color: var(--warn);
+}
+
+.tab-url {
+  font-size: 10px;
+  color: var(--text-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Intent pill — base (Phase 2: user intent) ───────────────────────────── */
+
+.intent-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding: 2px 8px 2px 5px;
+  width: fit-content;
+  max-width: 100%;
+
+  background: var(--accent-glow);
+  border: 1px solid rgba(124, 109, 250, 0.28);
+  border-radius: 20px;
+
+  overflow: hidden;
+}
+
+.intent-pill-mark {
+  font-size: 9px;
+  color: var(--accent);
+  filter: drop-shadow(0 0 3px var(--accent-glow));
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.intent-pill-text {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--accent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.01em;
+}
+
+/* ── Intent pill — AI variant (Phase 3) ──────────────────────────────────── */
+
+.intent-pill--ai {
+  background: rgba(107, 107, 128, 0.08);
+  border-color: rgba(107, 107, 128, 0.2);
+}
+
+.intent-pill--ai .intent-pill-mark {
+  color: var(--text-muted);
+  filter: none;
+  font-size: 8px;
+}
+
+.intent-pill--ai .intent-pill-text {
+  color: var(--text-muted);
+}
+
+.intent-pill-ai-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 500;
+  color: var(--text-faint);
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  padding-left: 2px;
+  border-left: 1px solid var(--border);
+  margin-left: 2px;
+  line-height: 1.2;
+}
+
+/* ── Age badge ────────────────────────────────────────────────────────────── */
+
+.tab-age {
+  font-size: 10px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  text-align: right;
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.stale .tab-age {
+  color: var(--warn);
+  font-weight: 500;
+}
+
+/* ── Loading state ───────────────────────────────────────────────────────── */
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 36px 0;
+}
+
+.loading-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 80%, 100% { opacity: 0.2; transform: scale(0.8); }
+  40%           { opacity: 1;   transform: scale(1.1); }
+}
+
+/* ── Empty state ─────────────────────────────────────────────────────────── */
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 40px 24px;
+  color: var(--text-faint);
+  font-size: 12px;
+}
+
+.empty-icon {
+  font-size: 28px;
+  opacity: 0.4;
+}
+
+.empty-state p {
+  text-align: center;
+  line-height: 1.6;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ── Footer ──────────────────────────────────────────────────────────────── */
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 18px;
+  border-top: 1px solid var(--border);
+  font-size: 10px;
+  color: var(--text-faint);
+  background: var(--surface);
+  letter-spacing: 0.04em;
+}
+
+.footer-settings {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  transition: color 0.15s;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.footer-settings:hover {
+  color: var(--accent);
+}
+
+/* ── Fade-in animation for tab items ────────────────────────────────────── */
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tab-item {
+  animation: fadeSlideIn 0.18s ease both;
+}

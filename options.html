@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhyTab · Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="shell">
+
+    <header class="header">
+      <div class="logo">
+        <span class="logo-mark">⌬</span>
+        <span class="logo-text">WhyTab</span>
+      </div>
+      <span class="header-sub">Settings</span>
+    </header>
+
+    <main class="content">
+
+      <section class="section">
+        <h2 class="section-title">AI Intent Inference</h2>
+        <p class="section-desc">
+          When you dismiss or ignore the intent bubble, WhyTab can automatically
+          infer why you opened the tab using Google Gemini. Enter your Gemini API key
+          to enable this feature.
+        </p>
+
+        <div class="field">
+          <label class="field-label" for="apiKeyInput">Gemini API Key</label>
+          <div class="field-row">
+            <input
+              id="apiKeyInput"
+              class="field-input"
+              type="password"
+              placeholder="AIza…"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button class="btn-toggle-visibility" id="toggleVisibility" aria-label="Show key" title="Show/hide key">
+              <span id="eyeIcon">◉</span>
+            </button>
+          </div>
+          <p class="field-hint">
+            Your key is stored locally and never leaves your browser.
+            Get a free key at <a href="https://aistudio.google.com" target="_blank" rel="noopener">aistudio.google.com</a>.
+          </p>
+        </div>
+
+        <div class="actions">
+          <button class="btn-save" id="saveBtn">Save</button>
+          <button class="btn-clear" id="clearBtn">Clear key</button>
+        </div>
+
+        <div class="status hidden" id="status"></div>
+      </section>
+
+    </main>
+
+  </div>
+  <script src="options.js"></script>
+</body>
+</html>
