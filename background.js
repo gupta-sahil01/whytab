@@ -1,7 +1,7 @@
 // WhyTab — background service worker (Manifest V3)
 // Tracks tab open time, last activation, and fires hourly stale-tab checks.
 // Phase 2: captures opening intent via injected content script.
-// Phase 3: AI-powered intent inference via Anthropic API.
+// Phase 3: AI-powered intent inference via Groq.
 
 const ALARM_NAME = "whytab-stale-check";
 const STALE_THRESHOLD_MS = 3 * 24 * 60 * 60 * 1000; // 3 days
@@ -77,58 +77,58 @@ async function markAsPrompted(tabId, url) {
   await chrome.storage.local.set({ promptedTabs: prompted });
 }
 
-// ─── Phase 3: AI intent inference ────────────────────────────────────────────
+// ─── Phase 3: AI intent inference (Groq) ─────────────────────────────────────
 
 async function inferIntent(tabId, title, url) {
   // Don't infer if user has already provided intent
   const tabData = await getTabData();
   if (tabData[tabId]?.userIntent || tabData[tabId]?.aiIntent) return;
 
-  const stored = await chrome.storage.local.get("anthropicApiKey");
-  const apiKey = stored.anthropicApiKey;
+  const stored = await chrome.storage.local.get("groqApiKey");
+  const apiKey = stored.groqApiKey;
   if (!apiKey) return; // no key configured, skip silently
 
+  const prompt = `A user opened a browser tab with this title and URL. In 8 words or fewer, write a short phrase describing why they likely opened it. No punctuation. No preamble. Just the phrase.
+
+Title: ${title}
+URL: ${url}`;
+
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
+        model: "llama-3.1-8b-instant",
         max_tokens: 30,
-        messages: [
-          {
-            role: "user",
-            content: `A user opened a browser tab with this title and URL. In 8 words or fewer, write a short phrase describing why they likely opened it. No punctuation. No preamble. Just the phrase.
-
-Title: ${title}
-URL: ${url}`,
-          },
-        ],
+        messages: [{ role: "user", content: prompt }],
       }),
     });
 
-    if (!response.ok) return;
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}));
+      console.warn("WhyTab: Groq error", response.status, JSON.stringify(err));
+      return;
+    }
 
     const data = await response.json();
-    const raw = data?.content?.[0]?.text?.trim();
+    const raw = data?.choices?.[0]?.message?.content?.trim();
     if (!raw) return;
 
-    // Sanitise: strip quotes, punctuation at start/end, limit length
+    // Sanitise: strip surrounding quotes and trailing punctuation
     const aiIntent = raw.replace(/^["']|["']$/g, "").replace(/\.$/, "").trim();
     if (!aiIntent) return;
 
     // Re-fetch in case state changed while we were awaiting
     const freshTabData = await getTabData();
-    if (!freshTabData[tabId]) return; // tab was closed
+    if (!freshTabData[tabId]) return;           // tab was closed
     if (freshTabData[tabId].userIntent) return; // user answered in the meantime
 
     freshTabData[tabId].aiIntent = aiIntent;
     await saveTabData(freshTabData);
+    console.log(`WhyTab: aiIntent saved for tab ${tabId}:`, aiIntent);
   } catch (err) {
     // Network errors, parse errors — fail silently
     console.warn("WhyTab: AI inference failed:", err.message);
@@ -140,7 +140,7 @@ URL: ${url}`,
 // Update metadata when a tab's URL/title/favicon changes, OR when it finishes
 // loading (Phase 2 + 3 injection point).
 async function onTabUpdated(tabId, changeInfo, tab) {
-  // ── Phase 2: inject bubble when page finishes loading ───────────────────
+  // ── Phase 2 + 3: inject bubble and kick off AI inference ────────────────
   if (changeInfo.status === "complete") {
     const url = tab.url || "";
     if (!shouldSkipUrl(url) && !(await hasBeenPromptedForOrigin(tabId, url))) {
@@ -157,9 +157,8 @@ async function onTabUpdated(tabId, changeInfo, tab) {
           console.warn(`WhyTab: could not inject into tab ${tabId}:`, err.message);
         }
 
-        // ── Phase 3: schedule AI inference after bubble window closes ──────
-        // We wait AI_INFERENCE_DELAY_MS to give the user a chance to respond.
-        // The inferIntent function checks userIntent again before calling the API.
+        // Phase 3: infer in parallel — inferIntent guards against overwriting
+        // userIntent if the user responds before the API call completes.
         inferIntent(tabId, tab.title || "", url);
       }
     }

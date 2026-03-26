@@ -1,19 +1,19 @@
 // WhyTab — options.js
-// Manages the Anthropic API key stored in chrome.storage.local.
+// Manages the Groq API key stored in chrome.storage.local.
 
-const input       = document.getElementById("apiKeyInput");
-const saveBtn     = document.getElementById("saveBtn");
-const clearBtn    = document.getElementById("clearBtn");
-const toggleBtn   = document.getElementById("toggleVisibility");
-const eyeIcon     = document.getElementById("eyeIcon");
-const statusEl    = document.getElementById("status");
+const input     = document.getElementById("apiKeyInput");
+const saveBtn   = document.getElementById("saveBtn");
+const clearBtn  = document.getElementById("clearBtn");
+const toggleBtn = document.getElementById("toggleVisibility");
+const eyeIcon   = document.getElementById("eyeIcon");
+const statusEl  = document.getElementById("status");
 
 // ─── Load saved key on open ───────────────────────────────────────────────────
 
 async function loadKey() {
-  const result = await chrome.storage.local.get("anthropicApiKey");
-  if (result.anthropicApiKey) {
-    input.value = result.anthropicApiKey;
+  const result = await chrome.storage.local.get("groqApiKey");
+  if (result.groqApiKey) {
+    input.value = result.groqApiKey;
   }
 }
 
@@ -37,19 +37,19 @@ saveBtn.addEventListener("click", async () => {
     return;
   }
 
-  if (!key.startsWith("sk-ant-")) {
-    showStatus("That doesn't look like a valid Anthropic key.", "error");
+  if (!key.startsWith("gsk_")) {
+    showStatus("That doesn't look like a valid Groq key.", "error");
     return;
   }
 
-  await chrome.storage.local.set({ anthropicApiKey: key });
+  await chrome.storage.local.set({ groqApiKey: key });
   showStatus("API key saved.");
 });
 
 // ─── Clear ────────────────────────────────────────────────────────────────────
 
 clearBtn.addEventListener("click", async () => {
-  await chrome.storage.local.remove("anthropicApiKey");
+  await chrome.storage.local.remove("groqApiKey");
   input.value = "";
   showStatus("API key cleared.");
 });
