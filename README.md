@@ -96,3 +96,9 @@ whytab/
 ```
 
 ---
+
+## Roadmap
+ 
+- [ ] Auto-close stale tabs after a configurable threshold
+
+---
