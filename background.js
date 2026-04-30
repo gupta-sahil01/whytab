@@ -259,6 +259,27 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // ─── Stale tab alarm ─────────────────────────────────────────────────────────
 
+async function autoCloseStaleTabs(thresholdMs) {
+  const tabData = await getTabData();
+  const now = Date.now();
+
+  // Only consider tabs that are not pinned and not currently active in any window
+  const closeableTabs = await chrome.tabs.query({ pinned: false, active: false });
+  const closeableIds = new Set(closeableTabs.map((t) => t.id));
+
+  const toClose = Object.values(tabData).filter(
+    (t) => closeableIds.has(t.id) && now - t.lastVisited >= thresholdMs
+  );
+
+  for (const tab of toClose) {
+    try {
+      await chrome.tabs.remove(tab.id);
+    } catch (_) {
+      // Tab may have already been closed
+    }
+  }
+}
+
 async function checkStaleTabs() {
   const tabData = await getTabData();
   const now = Date.now();
@@ -270,6 +291,13 @@ async function checkStaleTabs() {
     await chrome.storage.local.set({ staleCount: stale.length });
   } else {
     await chrome.storage.local.set({ staleCount: 0 });
+  }
+
+  // Auto-close: runs after stale count is updated so the badge reflects the removal
+  const settings = await chrome.storage.local.get(["autoCloseEnabled", "autoCloseDays"]);
+  if (settings.autoCloseEnabled) {
+    const days = Math.max(1, parseInt(settings.autoCloseDays) || 7);
+    await autoCloseStaleTabs(days * 24 * 60 * 60 * 1000);
   }
 }
 

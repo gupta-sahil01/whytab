@@ -59,6 +59,45 @@
         <div class="status hidden" id="status"></div>
       </section>
 
+      <div class="section-gap"></div>
+
+      <section class="section">
+        <h2 class="section-title">Auto-close Stale Tabs</h2>
+        <p class="section-desc">
+          Automatically close tabs you haven't visited after a set number of days.
+          Pinned tabs and whichever tab is currently active are never closed.
+        </p>
+
+        <div class="field">
+          <label class="toggle-row">
+            <input type="checkbox" id="autoCloseEnabled" />
+            <span class="toggle-track"><span class="toggle-thumb"></span></span>
+            <span class="toggle-label">Enable auto-close</span>
+          </label>
+        </div>
+
+        <div class="field" id="thresholdField">
+          <label class="field-label" for="autoCloseDays">Close after (days)</label>
+          <input
+            id="autoCloseDays"
+            class="field-input field-input--short"
+            type="number"
+            min="1"
+            max="365"
+            value="7"
+          />
+          <p class="field-hint">
+            Tabs not visited for this many days will be closed during the hourly background check.
+          </p>
+        </div>
+
+        <div class="actions">
+          <button class="btn-save" id="autoCloseSaveBtn">Save</button>
+        </div>
+
+        <div class="status hidden" id="autoCloseStatus"></div>
+      </section>
+
     </main>
 
   </div>
