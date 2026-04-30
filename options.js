@@ -69,6 +69,50 @@ input.addEventListener("keydown", (e) => {
   if (e.key === "Enter") saveBtn.click();
 });
 
+// ─── Auto-close settings ──────────────────────────────────────────────────────
+
+const autoCloseCheckbox = document.getElementById("autoCloseEnabled");
+const autoCloseDaysInput = document.getElementById("autoCloseDays");
+const thresholdField     = document.getElementById("thresholdField");
+const autoCloseSaveBtn   = document.getElementById("autoCloseSaveBtn");
+const autoCloseStatusEl  = document.getElementById("autoCloseStatus");
+
+function showAutoCloseStatus(message, type = "success") {
+  autoCloseStatusEl.textContent = message;
+  autoCloseStatusEl.className = `status ${type}`;
+  autoCloseStatusEl.classList.remove("hidden");
+  setTimeout(() => autoCloseStatusEl.classList.add("hidden"), 3000);
+}
+
+function syncThresholdVisibility() {
+  thresholdField.classList.toggle("hidden", !autoCloseCheckbox.checked);
+}
+
+autoCloseCheckbox.addEventListener("change", syncThresholdVisibility);
+
+async function loadAutoCloseSettings() {
+  const result = await chrome.storage.local.get(["autoCloseEnabled", "autoCloseDays"]);
+  autoCloseCheckbox.checked = !!result.autoCloseEnabled;
+  if (result.autoCloseDays) autoCloseDaysInput.value = result.autoCloseDays;
+  syncThresholdVisibility();
+}
+
+autoCloseSaveBtn.addEventListener("click", async () => {
+  const days = parseInt(autoCloseDaysInput.value);
+  if (!Number.isFinite(days) || days < 1) {
+    showAutoCloseStatus("Enter a number of days (minimum 1).", "error");
+    autoCloseDaysInput.focus();
+    return;
+  }
+
+  await chrome.storage.local.set({
+    autoCloseEnabled: autoCloseCheckbox.checked,
+    autoCloseDays: days,
+  });
+  showAutoCloseStatus("Auto-close settings saved.");
+});
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 
 loadKey();
+loadAutoCloseSettings();
